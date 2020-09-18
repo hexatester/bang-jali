@@ -131,3 +131,5 @@ dmypy.json
 # Stuff
 *.lock
 .vscode/
+*.session
+*.session-journal
