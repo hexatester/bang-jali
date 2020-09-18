@@ -33,7 +33,7 @@ async def hastag(event: Union[NewMessage.Event, Message]):
     user: User = await event.get_sender()
     if tag in TAGS and user.id == ADMIN or int(time.time()) - last_hastag > 60:
         message: Message = await event.get_reply_message()
-        await message.reply(TAGS[tag])
+        await message.reply(TAGS[tag], link_preview=False)
 
 
 @jali.on(ChatAction)
@@ -54,7 +54,11 @@ async def chat_action(event: Union[ChatAction.Event, Message]):
             **Feel free to sharing seputar UT, No SARA, No SPAM, No Iklan.**
             [Kumpulan Akses Bahan Ajar](https://t.me/UniversitasTerbuka/37415)
             [FAQ](https://t.me/UnivTerbukaID/11)
-            Bisa juga membaca bahan ajar di @UniversitasTerbukaBot
+            Bahan ajar juga bisa dibaca di @UniversitasTerbukaBot
             '''
-            await jali.send_message(chat.id, unindent(text))
+            await jali.send_message(
+                chat.id,
+                unindent(text),
+                link_preview=False,
+            )
             NEW_USERS.clear()
