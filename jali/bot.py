@@ -26,14 +26,16 @@ last_hastag = int(time.time()) - 60
 
 
 @jali.on(
-    NewMessage(forwards=False, pattern=r'^#[a-z]+$',
+    NewMessage(forwards=False, pattern=r'^!#[a-z]+$',
                func=lambda e: e.is_reply))
 async def hastag(event: Union[NewMessage.Event, Message]):
-    tag: str = event.raw_text[1:]
+    global last_hastag
+    tag: str = event.raw_text[2:]
     user: User = await event.get_sender()
     if tag in TAGS and user.id == ADMIN or int(time.time()) - last_hastag > 60:
         message: Message = await event.get_reply_message()
         await message.reply(TAGS[tag], link_preview=False)
+        last_hastag = int(time.time())
 
 
 @jali.on(ChatAction)
