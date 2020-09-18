@@ -1,10 +1,12 @@
+import time
+
 from telethon import TelegramClient
 from telethon.tl.custom import Message
 from telethon.tl.types import Chat, User
 from telethon.events import NewMessage, ChatAction
 from typing import Dict, List, Union
 
-from jali import ID, API_ID, API_HASH
+from jali.config import ID, API_ID, API_HASH, ADMIN
 from jali.utils import get_tags, unindent
 
 TAGS: Dict[str, str] = get_tags()
@@ -20,12 +22,16 @@ async def message(event: NewMessage.Event):
     pass
 
 
+last_hastag = int(time.time()) - 60
+
+
 @jali.on(
     NewMessage(forwards=False, pattern=r'^#[a-z]+$',
                func=lambda e: e.is_reply))
-async def katalog(event: Union[NewMessage.Event, Message]):
+async def hastag(event: Union[NewMessage.Event, Message]):
     tag: str = event.raw_text[1:]
-    if tag in TAGS:
+    user: User = await event.get_sender()
+    if tag in TAGS and user.id == ADMIN or int(time.time()) - last_hastag > 60:
         message: Message = await event.get_reply_message()
         await message.reply(TAGS[tag])
 
@@ -45,9 +51,10 @@ async def chat_action(event: Union[ChatAction.Event, Message]):
                     name += ' ' + user.last_name
                 text += f", [{name}](tg://user?id={user.id})"
             text += '''. 😃\n
-            - Feel free to sharing seputar UT
-            - No SARA
-            - No SPAM
-            - No Iklan
+            **Feel free to sharing seputar UT, No SARA, No SPAM, No Iklan.**
+            [Kumpulan Akses Bahan Ajar](https://t.me/UniversitasTerbuka/37415)
+            [FAQ](https://t.me/UnivTerbukaID/11)
+            Bisa juga membaca bahan ajar di @UniversitasTerbukaBot
             '''
             await jali.send_message(chat.id, unindent(text))
+            NEW_USERS.clear()
